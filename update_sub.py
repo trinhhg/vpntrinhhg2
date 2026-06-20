@@ -10,7 +10,7 @@ GitHub Actions: chạy mỗi 60 phút
 
 import requests, base64, urllib.parse, re, datetime, yaml, json, sys, time
 
-WORKER_DOMAIN = "https://vpntrinhhg.pages.dev"
+WORKER_DOMAIN = "https://vpntrinhhg2.pages.dev"
 API_LINKS = f"{WORKER_DOMAIN}/api/links"
 API_PUSH  = f"{WORKER_DOMAIN}/api/push_data"
 
