@@ -211,10 +211,21 @@ textarea.autog{resize:none;overflow:hidden;}
   <div id="dataReqBody" class="space-y-3"></div>
  </div>
 
- <!-- ===== LINK SUB ===== -->
+  <!-- ===== LINK SUB ===== -->
  <div id="t-lnk" class="hidden space-y-4 w-full min-w-0">
   <h2 class="text-lg md:text-2xl font-bold text-slate-800">Quản lý Link Sub Ẩn</h2>
-  <p class="text-[11px] text-slate-500 -mt-2">Các công cụ bảo trì (Rà quét & Map lại, Dọn KV, Rebuild MAP, Sắp xếp, Đồng bộ GH) đã chuyển sang <b>Cài đặt → Set Web → Bảo trì Link Sub</b>.</p>
+  <p class="text-[11px] text-slate-500 -mt-2">Công cụ Rà quét &amp; Map lại nằm ở <b>Cài đặt → Set Web → Bảo trì Link Sub</b>.</p>
+
+  <!-- Khối 4 nút bảo trì (nằm riêng biệt, không tiêu đề) -->
+  <div class="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm mb-3">
+   <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
+    <button id="btnRunGC" onclick="runGC()" class="bg-white text-red-600 hover:bg-red-50 font-bold py-2 rounded-xl text-xs shadow-sm border border-slate-200 flex items-center justify-center gap-1.5 transition active:scale-95"><i class="fas fa-broom"></i>Dọn KV</button>
+    <button id="btnRebuildAll" onclick="rebuildAllMAP()" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold py-2 rounded-xl text-xs shadow-sm border border-emerald-100 flex items-center justify-center gap-1.5 transition active:scale-95"><i class="fas fa-rotate"></i>Rebuild MAP</button>
+    <button id="btnSortLinks" onclick="sortAllLinks()" class="bg-purple-50 text-purple-700 hover:bg-purple-100 font-bold py-2 rounded-xl text-xs shadow-sm border border-purple-100 flex items-center justify-center gap-1.5 transition active:scale-95"><i class="fas fa-sort-numeric-down"></i>Sắp xếp</button>
+    <button id="btnTriggerGH" onclick="triggerGitHub()" class="bg-blue-600 text-white hover:bg-blue-700 font-bold py-2 rounded-xl text-xs shadow-md flex items-center justify-center gap-1.5 transition active:scale-95"><i class="fab fa-github"></i>Đồng bộ GH</button>
+   </div>
+  </div>
+
   <div class="grid grid-cols-2 gap-2 w-full mb-2">
    <button id="btn-ls-manual" onclick="switchLinkMode('manual')" class="link-tab-btn active bg-white border border-slate-200 shadow-sm rounded-xl text-slate-600 font-bold text-[11px] py-2"><i class="fas fa-magic mr-1"></i>TẠO THỦ CÔNG</button>
    <button id="btn-ls-pool" onclick="switchLinkMode('pool')" class="link-tab-btn bg-white border border-slate-200 shadow-sm rounded-xl text-slate-600 font-bold text-[11px] py-2"><i class="fas fa-plus-circle mr-1"></i>THÊM NGUỒN</button>
@@ -393,12 +404,23 @@ textarea.autog{resize:none;overflow:hidden;}
 
       <!-- CỘT PHẢI (Routing, Vệ tinh, Khóa hạn) -->
       <div class="flex flex-col gap-4">
-        <!-- Hàng 1 Phải: F. Routing + blur -->
+                <!-- Khối 1: Định tuyến Gốc (Tạo Link Sub dán vào ô nào) -->
         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-2">
-         <div class="font-bold text-sm text-slate-800"><i class="fas fa-route text-indigo-500 mr-1.5"></i>Định tuyến &amp; Làm mờ (Blur)</div>
-         <p class="text-[10px] text-slate-500">Nhập từ khoá domain của web (VD: doicucden) để xác định ô Link 1/2/3. Chỉ khi đã nhập định tuyến mới bật được Làm mờ. Làm mờ chỉ che link với khách, không xóa link ở backend.</p>
+         <div class="font-bold text-sm text-slate-800"><i class="fas fa-route text-indigo-500 mr-1.5"></i>1. Định tuyến Gốc (Gán ô Link 1/2/3)</div>
+         <p class="text-[10px] text-slate-500">Nhập từ khóa domain của từng web (VD: doicucden, onepiece, lucastanora) để Worker biết khi tạo link sub thì dán vào ô Link 1, Link 2 hay Link 3.</p>
          <div id="routeRows" class="space-y-2"></div>
-         <button onclick="saveRouting()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">LƯU ĐỊNH TUYẾN &amp; BLUR</button>
+         <button onclick="saveRouting()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl text-xs shadow-md">LƯU ĐỊNH TUYẾN GỐC</button>
+        </div>
+
+        <!-- Khối 2: Cấu hình Làm mờ (Blur - Riêng web này, KHÔNG đồng bộ) -->
+        <div class="bg-white border border-purple-200 rounded-2xl shadow-sm p-5 space-y-2">
+         <div class="font-bold text-sm text-purple-800 flex items-center justify-between">
+           <span><i class="fas fa-eye-slash text-purple-500 mr-1.5"></i>2. Cấu hình Làm mờ (Blur - Web này)</span>
+           <span class="text-[10px] font-black px-2 py-0.5 rounded bg-purple-100 text-purple-700">Chỉ web này</span>
+         </div>
+         <p class="text-[10px] text-slate-500">Nhập tên ô định tuyến muốn làm mờ và gạt Bật/Tắt. Cài đặt này chỉ áp dụng trên chính web này, không đồng bộ sang web khác.</p>
+         <div id="blurRows" class="space-y-2"></div>
+         <button onclick="saveBlur()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">LƯU CẤU HÌNH LÀM MỜ</button>
         </div>
 
         <!-- Hàng 2 Phải: E. Vệ tinh -->
@@ -430,14 +452,17 @@ textarea.autog{resize:none;overflow:hidden;}
      <button onclick="saveDock()" class="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">LƯU ICON DOCK</button>
     </div>
 
-    <!-- Hàng 5: A2. Nhà cung cấp gửi mail -->
+        <!-- Hàng 5: A2. Nhà cung cấp gửi mail -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-3">
      <div class="flex items-center justify-between">
       <div class="font-extrabold text-sm text-slate-800"><i class="fas fa-paper-plane text-indigo-500 mr-1.5"></i>Nhà cung cấp gửi mail</div>
       <button onclick="loadQuota()" class="text-xs bg-indigo-50 text-indigo-600 font-bold px-2 py-1 rounded hover:bg-indigo-100"><i class="fas fa-sync mr-1"></i>Làm mới quota</button>
      </div>
-     <p class="text-[11px] text-slate-500">Chọn nơi Worker gửi mọi mail (báo khách, mail admin, nhắc hết hạn). Chỉ 1 nhà cung cấp hoạt động tại một thời điểm — bấm "Chọn &amp; Lưu mặc định" trên thẻ muốn dùng.</p>
+     <p class="text-[11px] text-slate-500">Chọn nơi Worker gửi mọi mail (báo khách, mail admin, nhắc hết hạn). Nhấp vào thẻ để chọn nhà cung cấp, sau đó bấm Lưu cấu hình.</p>
      <div id="mailProvCards" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+     <button id="btnSaveMailProv" onclick="saveMailProvider()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition active:scale-95 mt-2 flex items-center justify-center gap-1.5">
+      <i class="fas fa-floppy-disk"></i>LƯU CẤU HÌNH NHÀ CUNG CẤP MAIL
+     </button>
     </div>
 
     <!-- Hàng 6: I. Quota -->
@@ -446,16 +471,9 @@ textarea.autog{resize:none;overflow:hidden;}
      <div id="quotaBody" class="pt-3 grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs text-slate-500">Đang tải quota...</div>
     </div>
 
-    <!-- Hàng 7: H. Bảo trì Link Sub -->
+        <!-- Hàng 7: H. Bảo trì Link Sub -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
-     <div class="font-extrabold text-sm text-slate-800"><i class="fas fa-toolbox text-amber-500 mr-1.5"></i>Bảo trì Link Sub</div>
-     <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 w-full">
-      <button id="btnRunGC" onclick="runGC()" class="bg-white text-red-600 hover:bg-red-50 font-bold py-2 rounded-xl text-xs shadow-sm border border-slate-200"><i class="fas fa-broom mr-1"></i>Dọn KV</button>
-      <button id="btnRebuildAll" onclick="rebuildAllMAP()" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold py-2 rounded-xl text-xs shadow-sm border border-emerald-100"><i class="fas fa-rotate mr-1"></i>Rebuild MAP</button>
-      <button id="btnSortLinks" onclick="sortAllLinks()" class="bg-purple-50 text-purple-700 hover:bg-purple-100 font-bold py-2 rounded-xl text-xs shadow-sm border border-purple-100"><i class="fas fa-sort-numeric-down mr-1"></i>Sắp xếp</button>
-      <button id="btnTriggerGH" onclick="triggerGitHub()" class="bg-blue-600 text-white hover:bg-blue-700 font-bold py-2 rounded-xl text-xs shadow-md"><i class="fab fa-github mr-1"></i>Đồng bộ GH</button>
-     </div>
-     <div class="font-bold text-sm text-slate-800 border-t border-slate-100 pt-3"><i class="fas fa-magnifying-glass text-amber-500 mr-1.5"></i>Rà quét &amp; Map lại <span class="text-[10px] font-normal text-slate-400">(không tự chạy khi mở trang)</span></div>
+     <div class="font-bold text-sm text-slate-800"><i class="fas fa-magnifying-glass text-amber-500 mr-1.5"></i>Rà quét &amp; Map lại <span class="text-[10px] font-normal text-slate-400">(không tự chạy khi mở trang)</span></div>
      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
       <div class="border border-amber-200 rounded-xl p-3 bg-amber-50/30 space-y-2">
        <div class="font-extrabold text-xs text-amber-700">A. RÀ QUÉT</div>
@@ -1377,10 +1395,90 @@ async function saveCms(){
 const saveCmsDb=()=>{const s=cmsDb.settings;["syncD1Url","syncD1Secret","crossSyncEnabled","mailLog","sysLog","autoRole"].forEach(k=>delete s[k]);return aj("/api/cms",{method:"POST",body:cmsDb});};
 function switchSettingsTab(t){["setweb","log","dev","time"].forEach(x=>{$("settings-view-"+x).classList.toggle("hidden",x!==t);$("stab-"+x).classList.toggle("active",x===t);});if(t==="log")loadLogs();if(t==="dev")renderDev();if(t==="setweb"||t==="time")loadSettingsUI();if(t==="setweb"){loadStatus();loadQuota();}}
 function showCronLog(){switchSettingsTab("log");$("logSrc").value="cron";$("logLvl").value="";loadLogs();}
-function checkBlur(i){const has=$("routeWeb"+i).value.trim(),c=$("blurWeb"+i);if(!has){c.checked=false;c.disabled=true;}else c.disabled=false;}
-function renderRouteRows(){const s=cmsDb.settings;$("routeRows").innerHTML=[1,2,3].map(i=>`<div class="flex items-center justify-between bg-slate-50 border border-slate-200 p-2 rounded-xl"><div class="flex-1 mr-3"><label class="block font-bold text-[10px] text-slate-600 mb-1">Web ${i} → Link ${i} (từ khoá domain)</label><input id="routeWeb${i}" type="text" oninput="checkBlur(${i})" value="${esc(s["routeWeb"+i]||"")}" placeholder="${["doicucden","onepiece","lucastanora"][i-1]}" class="w-full p-2 border border-slate-200 rounded-lg outline-none font-mono text-[11px] bg-white"></div><div class="flex flex-col items-center shrink-0"><label class="block font-bold text-[10px] text-slate-600 mb-1">Làm mờ</label><div class="toggle-wrap"><input type="checkbox" id="blurWeb${i}" ${s["blurWeb"+i]?"checked":""}><span class="toggle-slider"></span></div></div></div>`).join("");[1,2,3].forEach(checkBlur);}
-async function saveRouting(){const s=cmsDb.settings;[1,2,3].forEach(i=>{const r=$("routeWeb"+i).value.trim();s["routeWeb"+i]=r;s["blurWeb"+i]=!!(r&&$("blurWeb"+i).checked);});
- try{await saveCmsDb();toast("Đã lưu định tuyến & blur");logEvent("ok","Lưu cấu hình","Định tuyến & Blur");renderOrd();renderRouteRows();}catch(e){toast("Lỗi lưu: "+e.message,"err");}}
+// Khối 1: Render & Lưu Định tuyến Gốc (Chỉ phục vụ gán ô dán link)
+function renderRouteRows(){
+  const s = cmsDb.settings;
+  $("routeRows").innerHTML = [1, 2, 3].map(i => `
+    <div class="bg-slate-50 border border-slate-200 p-2 rounded-xl">
+      <label class="block font-bold text-[10px] text-slate-600 mb-1">Web ${i} → Ô Link ${i} (từ khoá domain)</label>
+      <input id="routeWeb${i}" type="text" value="${esc(s["routeWeb" + i] || "")}" placeholder="${["doicucden", "onepiece", "lucastanora"][i - 1]}" class="w-full p-1.5 border border-slate-200 rounded-lg outline-none font-mono text-[11px] bg-white">
+    </div>
+  `).join("");
+}
+
+async function saveRouting(){
+  const s = cmsDb.settings;
+  [1, 2, 3].forEach(i => { s["routeWeb" + i] = $("routeWeb" + i).value.trim(); });
+  try {
+    await saveCmsDb();
+    toast("Đã lưu Định tuyến Gốc");
+    logEvent("ok", "Lưu cấu hình", "Định tuyến Gốc");
+    renderRouteRows();
+  } catch(e) {
+    toast("Lỗi lưu: " + e.message, "err");
+  }
+}
+
+// Khối 2: Render & Lưu Làm mờ (Quy định cứng: doicucden / onepiecechapter / lucastanora)
+const BLUR_RULES = { 1: "doicucden", 2: "onepiecechapter", 3: "lucastanora" };
+
+function checkBlurValidity(i) {
+  const val = String($("blurRoute" + i)?.value || "").trim().toLowerCase();
+  const req = BLUR_RULES[i];
+  const badge = $("blurBadge" + i);
+  if (!badge) return;
+  if (!val) {
+    badge.className = "text-[9px] font-bold text-slate-400";
+    badge.textContent = "Chưa nhập";
+  } else if (val.includes(req)) {
+    badge.className = "text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200";
+    badge.textContent = "✔ Hợp lệ (" + req + ")";
+  } else {
+    badge.className = "text-[9px] font-black text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200";
+    badge.textContent = "✘ Phải nhập: " + req;
+  }
+}
+
+function renderBlurRows(){
+  const s = cmsDb.settings;
+  $("blurRows").innerHTML = [1, 2, 3].map(i => `
+    <div class="flex items-center justify-between bg-purple-50/50 border border-purple-100 p-2.5 rounded-xl">
+      <div class="flex-1 mr-3">
+        <div class="flex items-center justify-between mb-1">
+          <label class="block font-bold text-[10px] text-purple-900">Ô ${i} → Mờ Link ${i}</label>
+          <span id="blurBadge${i}"></span>
+        </div>
+        <input id="blurRoute${i}" type="text" oninput="checkBlurValidity(${i})" value="${esc(s["blurRoute" + i] || "")}" placeholder="Bắt buộc nhập: ${BLUR_RULES[i]}" class="w-full p-1.5 border border-purple-200 rounded-lg outline-none font-mono text-[11px] bg-white font-bold text-purple-950">
+      </div>
+      <div class="flex flex-col items-center shrink-0">
+        <label class="block font-bold text-[10px] text-purple-800 mb-1">Bật mờ</label>
+        <div class="toggle-wrap">
+          <input type="checkbox" id="blurOn${i}" ${s["blurOn" + i] ? "checked" : ""}>
+          <span class="toggle-slider"></span>
+        </div>
+      </div>
+    </div>
+  `).join("");
+  [1, 2, 3].forEach(checkBlurValidity);
+}
+
+async function saveBlur(){
+  const s = cmsDb.settings;
+  [1, 2, 3].forEach(i => {
+    s["blurRoute" + i] = $("blurRoute" + i).value.trim();
+    s["blurOn" + i] = $("blurOn" + i).checked;
+  });
+  try {
+    // Chỉ lưu vào KV của web này, KHÔNG bắn đồng bộ đi đâu cả!
+    await saveCmsDb();
+    toast("Đã lưu cấu hình làm mờ cho web này");
+    logEvent("ok", "Lưu cấu hình", "Làm mờ Blur cục bộ");
+    renderBlurRows();
+    renderOrd();
+  } catch(e) {
+    toast("Lỗi lưu: " + e.message, "err");
+  }
+}
 function renderSyncWorkers(){$("syncWorkerList").innerHTML=arr(cmsDb.settings.syncWorkers).map((w,i)=>`<div><div class="flex items-center gap-2"><input type="text" id="syncW_${i}" value="${esc(w.url)}" placeholder="https://worker..." class="w-full p-2 border border-slate-200 rounded-xl outline-none font-mono text-[11px] bg-slate-50"><div class="toggle-wrap"><input type="checkbox" id="syncWActive_${i}" ${w.active?"checked":""}><span class="toggle-slider"></span></div><button onclick="testSyncWorker(${i})" title="Kiểm tra kết nối" class="shrink-0 bg-sky-50 text-sky-600 p-2.5 rounded-xl hover:bg-sky-500 hover:text-white"><i class="fas fa-plug"></i></button><button onclick="removeSyncWorker(${i})" class="shrink-0 bg-red-50 text-red-500 p-2.5 rounded-xl hover:bg-red-500 hover:text-white"><i class="fas fa-trash"></i></button></div><div id="syncRes_${i}" class="text-[10px] pl-1 mt-0.5"></div></div>`).join("")||'<div class="text-[11px] text-slate-400 italic">Chưa có Worker vệ tinh nào.</div>';}
 function readWorkers(){const a=arr(cmsDb.settings.syncWorkers);a.forEach((w,i)=>{if($("syncW_"+i)){w.url=$("syncW_"+i).value.trim();w.active=$("syncWActive_"+i).checked;}});cmsDb.settings.syncWorkers=a.filter(w=>w.url);}
 function addSyncWorker(){readWorkers();cmsDb.settings.syncWorkers.push({url:"",active:true});renderSyncWorkers();}
@@ -1404,7 +1502,7 @@ function addDockIcon(){const a=readDockRows();a.push({name:"",img:"",url:""});cm
 function removeDockIcon(i){const a=readDockRows();a.splice(i,1);cmsDb.settings.dock=a;renderDockRows();}
 async function saveDock(){const a=readDockRows().filter(it=>/^https?:\/\//i.test(it.img||""));cmsDb.settings.dock=a;try{await saveCmsDb();toast("Đã lưu Icon Dock ("+a.length+" icon tùy chỉnh)");logEvent("ok","Lưu cấu hình","Icon Dock");renderDockRows();}catch(e){toast("Lỗi lưu: "+e.message,"err");}}
 function loadSettingsUI(){
- const s=cmsDb.settings;renderRouteRows();renderSyncWorkers();renderDockRows();renderMailProvCards();
+ const s=cmsDb.settings;renderRouteRows();renderBlurRows();renderSyncWorkers();renderDockRows();renderMailProvCards();
  const rr=document.querySelector(`input[name=emailRoleRad][value=${s.emailRole==="master"?"master":"slave"}]`);if(rr)rr.checked=true;
  $("toggleAutoMail").checked=!!s.autoMailEnabled;$("toggleAutoMigrate").checked=s.autoMigrateNode!==false;$("toggleLockExpiry").checked=!!s.lockExpiry;
  $("toggleLockFulfill").checked=!!s.lockFulfill;$("toggleMailOnSave").checked=mailOnSaveOn();paintTimeUI();
@@ -1494,31 +1592,136 @@ const MAIL_PROV_META={
  brevo:{name:"Brevo",sub:"(Sendinblue) — 300 mail/ngày free",logo:'<img src="https://ps.w.org/mailin/assets/icon-256x256.png" class="w-7 h-7 shrink-0 rounded-lg shadow-sm object-contain bg-white">'},
  sendpulse:{name:"SendPulse",sub:"SMTP theo gói / balance",logo:'<img src="https://s3.amazonaws.com/appforest_uf/f1645282052830x986159287891572600/sendpulse-logo-symbol.png" class="w-7 h-7 shrink-0 rounded-lg shadow-sm object-contain bg-white">'}
 };
-let mailProvQuota={},mailProvCfg={},mailProvErr={};
-function mailProvCard(id){
- const m=MAIL_PROV_META[id],cur=(cmsDb.settings&&cmsDb.settings.mailProvider)||"google",on=cur===id,ready=id==="google"?true:!!mailProvCfg[id],err=mailProvErr[id],q=mailProvQuota[id];
- let body='<div class="text-[10px] text-slate-400">Bấm "Làm mới quota"</div>';
- if(!ready)body='<div class="text-[10px] text-slate-400">Chưa cấu hình biến trên Worker</div>';
- else if(err)body=`<div class="text-[10px] text-red-500">${esc(err)}</div>`;
- else if(id==="google"&&q)body=`<div class="text-[11px] text-slate-600">Còn <b class="text-emerald-600">${q.remaining}</b>/${q.limit} người nhận (24h)</div>`;
- else if(id==="brevo"&&q)body=`<div class="text-[11px] text-slate-600">Credits còn: <b class="text-emerald-600">${q.credits??"—"}</b>${q.creditsType?" ("+esc(q.creditsType)+")":""}</div>`;
-else if(id==="sendpulse"&&q) {
-   if (q.monthTotal !== undefined && q.monthTotal !== null) {
-     // Giao diện cho gói SMTP có quota rõ ràng (ngày/tháng/giờ)
-     body = `<div class="text-[11px] text-slate-600 mb-2 font-bold">${esc(q.tariff)}</div>`
-          + qBar(q.monthTotal - q.monthLeft, q.monthTotal, "Tháng", "email", "")
-          + `<div class="h-2"></div>`
-          + (q.dayTotal ? qBar(q.dayTotal - q.dayLeft, q.dayTotal, "Ngày", "email", "") : "")
-          + `<div class="h-2"></div>`
-          + (q.minTotal ? qBar(q.minTotal - q.minLeft, q.minTotal, "Phút", "email", "") : "");
-   } else {
-     // Fallback cho tài khoản cũ không có quota SMTP
-     body = `<div class="text-[11px] text-slate-600">Email còn: <b class="text-emerald-600">${q.emailsLeftFallback??"—"}</b>${q.tariff?`<br><span class="text-slate-400">${esc(q.tariff)}</span>`:""}</div>`;
-   }
- }
- return `<div class="border-2 ${on?"border-indigo-500 bg-indigo-50":"border-slate-200 bg-white"} rounded-2xl p-3 flex flex-col gap-2"><div class="flex items-center gap-2">${m.logo}<div class="min-w-0"><div class="font-extrabold text-xs text-slate-800">${m.name}</div><div class="text-[10px] text-slate-500">${m.sub}</div></div>${on?'<span class="ml-auto bg-indigo-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full whitespace-nowrap">ĐANG DÙNG</span>':""}</div><div class="min-h-[32px]">${body}</div><button ${ready?"":"disabled"} onclick="pickMailProvider('${id}')" class="${on?"bg-slate-100 text-slate-400 cursor-default":ready?"bg-indigo-600 hover:bg-indigo-700 text-white":"bg-slate-100 text-slate-300 cursor-not-allowed"} font-bold py-2 rounded-lg text-xs">${on?"Đang chọn":"Chọn & Lưu mặc định"}</button></div>`;}
-function renderMailProvCards(){const el=$("mailProvCards");if(el)el.innerHTML=["google","brevo","sendpulse"].map(mailProvCard).join("");}
-async function pickMailProvider(id){cmsDb.settings.mailProvider=id;try{await saveCmsDb();toast("Đã chọn "+MAIL_PROV_META[id].name+" làm nhà cung cấp gửi mail");logEvent("ok","Lưu cấu hình","Nhà cung cấp mail: "+id);renderMailProvCards();}catch(e){toast("Lỗi lưu: "+e.message,"err");}}
+let mailProvQuota = {}, mailProvCfg = {}, mailProvErr = {}, selectedMailProv = null;
+
+// Thẻ hiển thị: click trực tiếp vào thẻ để chọn (sáng viền tím)
+function mailProvCard(id) {
+  const m = MAIL_PROV_META[id] || { name: id, sub: "", logo: "" };
+  const saved = (cmsDb && cmsDb.settings && cmsDb.settings.mailProvider) 
+             || localStorage.getItem(SITE_KEY + "_mailProv") 
+             || "google";
+  const active = selectedMailProv || saved;
+  const isSelected = (active === id);
+  const isSaved = (saved === id);
+  const ready = id === "google" ? true : !!mailProvCfg[id];
+  const err = mailProvErr[id];
+  const q = mailProvQuota[id];
+
+  let body = '<div class="text-[10px] text-slate-400">Bấm "Làm mới quota"</div>';
+  if (!ready) {
+    body = '<div class="text-[10px] text-rose-500 font-bold"><i class="fas fa-circle-exclamation mr-1"></i>Chưa cấu hình biến trên Worker</div>';
+  } else if (err) {
+    body = `<div class="text-[10px] text-rose-500 font-semibold">${esc(err)}</div>`;
+  } else if (id === "google" && q) {
+    body = `<div class="text-[11px] text-slate-600">Còn <b class="text-emerald-600">${q.remaining}</b>/${q.limit} người nhận (24h)</div>`;
+  } else if (id === "brevo" && q) {
+    body = `<div class="text-[11px] text-slate-600">Credits còn: <b class="text-emerald-600">${q.credits ?? "—"}</b>${q.creditsType ? " (" + esc(q.creditsType) + ")" : ""}</div>`;
+  } else if (id === "sendpulse" && q) {
+    if (q.monthTotal !== undefined && q.monthTotal !== null) {
+      const usedMonth = q.monthLeft !== undefined && q.monthLeft !== null ? Math.max(0, q.monthTotal - q.monthLeft) : (q.totalSent || 0);
+      body = `<div class="text-[11px] text-slate-600 mb-1.5 font-bold flex justify-between items-center"><span>${esc(q.tariff || "SMTP Free")}</span>${q.hourLimit || q.dayTotal ? `<span class="text-[10px] text-slate-400 font-normal">Giới hạn: ${q.hourLimit || q.dayTotal} mail/h</span>` : ""}</div>`
+           + qBar(usedMonth, q.monthTotal, "Tháng", "email", "");
+    } else {
+      body = `<div class="text-[11px] text-slate-600">Email còn: <b class="text-emerald-600">${q.emailsLeftFallback ?? (q.totalSent != null ? q.totalSent + " đã gửi" : "—")}</b>${q.tariff ? `<br><span class="text-slate-400">${esc(q.tariff)}</span>` : ""}</div>`;
+    }
+  }
+
+  // Badge góc phải: phân biệt rõ ĐANG DÙNG (đã lưu) vs ĐANG CHỌN (chờ bấm Lưu)
+  let badgeHtml = "";
+  if (isSelected && isSaved) {
+    badgeHtml = '<span class="ml-auto bg-emerald-100 text-emerald-700 border border-emerald-300 text-[9px] font-black px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm flex items-center gap-1"><i class="fas fa-check text-[8px]"></i>ĐANG DÙNG</span>';
+  } else if (isSelected && !isSaved) {
+    badgeHtml = '<span class="ml-auto bg-purple-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm flex items-center gap-1 animate-pulse"><i class="fas fa-hand-pointer text-[8px]"></i>ĐANG CHỌN</span>';
+  } else if (!isSelected && isSaved) {
+    badgeHtml = '<span class="ml-auto bg-slate-100 text-slate-600 text-[9px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap">HIỆN TẠI</span>';
+  } else {
+    badgeHtml = '<span class="ml-auto text-slate-400 text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 whitespace-nowrap">Bấm để chọn</span>';
+  }
+
+  return `
+    <div onclick="selectMailProvider('${id}')" class="cursor-pointer border-2 transition-all duration-200 ${isSelected ? "border-purple-600 bg-purple-50/70 shadow-sm ring-1 ring-purple-400" : "border-slate-200 bg-white hover:border-purple-300 hover:bg-slate-50"} rounded-2xl p-3 flex flex-col gap-2 select-none">
+      <div class="flex items-center gap-2">
+        ${m.logo}
+        <div class="min-w-0 flex-1">
+          <div class="font-extrabold text-xs text-slate-800">${m.name}</div>
+          <div class="text-[10px] text-slate-500">${m.sub}</div>
+        </div>
+        ${badgeHtml}
+      </div>
+      <div class="min-h-[32px] pt-1">
+        ${body}
+      </div>
+    </div>
+  `;
+}
+
+// Bấm vào thẻ: cập nhật lựa chọn tạm thời
+function selectMailProvider(id) {
+  selectedMailProv = id;
+  renderMailProvCards();
+}
+const pickMailProvider = selectMailProvider; // Giữ alias dự phòng
+
+// Bấm nút "LƯU CẤU HÌNH NHÀ CUNG CẤP MAIL" phía dưới
+async function saveMailProvider() {
+  const saved = (cmsDb && cmsDb.settings && cmsDb.settings.mailProvider) 
+             || localStorage.getItem(SITE_KEY + "_mailProv") 
+             || "google";
+  const target = selectedMailProv || saved;
+
+  if (!cmsDb.settings) cmsDb.settings = {};
+  cmsDb.settings.mailProvider = target;
+  localStorage.setItem(SITE_KEY + "_mailProv", target);
+
+  const btn = $("btnSaveMailProv");
+  const origText = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1.5"></i>ĐANG LƯU CẤU HÌNH...';
+  }
+
+  try {
+    await saveCmsDb();
+    selectedMailProv = null; // Reset về null để lấy thẳng từ cấu hình đã lưu
+    const provName = (MAIL_PROV_META[target] && MAIL_PROV_META[target].name) || target;
+    toast("Đã lưu nhà cung cấp gửi mail mặc định: " + provName);
+    logEvent("ok", "Lưu cấu hình", "Nhà cung cấp mail: " + target);
+    renderMailProvCards();
+  } catch (e) {
+    toast("Lỗi lưu cấu hình: " + e.message, "err");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origText;
+    }
+  }
+}
+
+function renderMailProvCards() {
+  // Đồng bộ cache nếu cmsDb đã tải xong từ server
+  if (cmsDb && cmsDb.settings && cmsDb.settings.mailProvider) {
+    localStorage.setItem(SITE_KEY + "_mailProv", cmsDb.settings.mailProvider);
+  }
+
+  const el = $("mailProvCards");
+  if (el) el.innerHTML = ["google", "brevo", "sendpulse"].map(mailProvCard).join("");
+
+  const saved = (cmsDb && cmsDb.settings && cmsDb.settings.mailProvider) 
+             || localStorage.getItem(SITE_KEY + "_mailProv") 
+             || "google";
+  const active = selectedMailProv || saved;
+  const btn = $("btnSaveMailProv");
+  if (btn) {
+    const provName = (MAIL_PROV_META[active] && MAIL_PROV_META[active].name) || active;
+    if (selectedMailProv && selectedMailProv !== saved) {
+      btn.classList.add("ring-2", "ring-purple-400", "animate-pulse");
+      btn.innerHTML = `<i class="fas fa-floppy-disk mr-1.5"></i>LƯU CẤU HÌNH: CHUYỂN SANG DÙNG ${provName.toUpperCase()}`;
+    } else {
+      btn.classList.remove("ring-2", "ring-purple-400", "animate-pulse");
+      btn.innerHTML = `<i class="fas fa-floppy-disk mr-1.5"></i>LƯU CẤU HÌNH NHÀ CUNG CẤP MAIL (${provName.toUpperCase()})`;
+    }
+  }
+}
 async function loadQuota(){
  const el=$("quotaBody");if(!el)return;
  try{
